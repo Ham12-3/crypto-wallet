@@ -1,7 +1,19 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import '../../../../core/config/supabase_config.dart';
 
 class AuthService {
   final SupabaseClient _supabase = Supabase.instance.client;
+
+  GoogleSignIn? _googleSignInInstance;
+
+  GoogleSignIn get _googleSignIn {
+    _googleSignInInstance ??= GoogleSignIn(
+      serverClientId: SupabaseConfig.googleWebClientId,
+      scopes: ['email', 'profile', 'openid'],
+    );
+    return _googleSignInInstance!;
+  }
 
   /// Sign in with email and password
   Future<AuthResponse> signInWithEmail({
@@ -35,14 +47,44 @@ class AuthService {
     }
   }
 
-  /// Sign in with Google using Supabase OAuth
+  /// Sign in with Google using native Google Sign-In
   Future<bool> signInWithGoogle() async {
     try {
-      await _supabase.auth.signInWithOAuth(
-        OAuthProvider.google,
-        redirectTo: 'io.supabase.wallet://login-callback/', // Change this to your app's deep link
+      // Debug: Check if client ID is loaded
+      final clientId = SupabaseConfig.googleWebClientId;
+      print('🔑 Google Web Client ID: ${clientId.isEmpty ? "EMPTY!" : clientId}');
+
+      if (clientId.isEmpty) {
+        throw Exception('Google Web Client ID is not configured in .env file');
+      }
+
+      // Trigger the Google Sign-In flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser == null) {
+        // User canceled the sign-in
+        return false;
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Get the ID token
+      final String? idToken = googleAuth.idToken;
+      final String? accessToken = googleAuth.accessToken;
+
+      if (idToken == null) {
+        throw Exception('No ID Token found.');
+      }
+
+      // Sign in to Supabase with the Google ID token
+      final AuthResponse response = await _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
       );
-      return true;
+
+      return response.user != null;
     } catch (e) {
       rethrow;
     }

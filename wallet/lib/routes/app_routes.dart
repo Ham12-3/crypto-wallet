@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import '../features/auth/presentation/pages/login_screen.dart';
 import '../features/auth/presentation/pages/signup_screen.dart';
+import '../features/portfolio/presentation/pages/portfolio_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
   static const String signup = '/signup';
   static const String home = '/home';
+  static const String portfolio = '/portfolio';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -17,12 +19,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const SignupScreen());
 
       case home:
-        // TODO: Add home screen
-        return MaterialPageRoute(
-          builder: (_) => const Scaffold(
-            body: Center(child: Text('Home Screen')),
-          ),
-        );
+      case portfolio:
+        return MaterialPageRoute(builder: (_) => const PortfolioScreen());
 
       default:
         return MaterialPageRoute(
