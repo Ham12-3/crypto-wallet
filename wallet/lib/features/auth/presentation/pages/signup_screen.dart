@@ -34,7 +34,6 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo and Title
                   const Text(
                     '✦ ${AppStrings.appName}',
                     style: TextStyle(
@@ -52,8 +51,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   const SizedBox(height: 48),
-
-                  // Name Label
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -66,8 +63,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-
-                  // Name TextField
                   TextFormField(
                     controller: _nameController,
                     decoration: InputDecoration(
@@ -85,8 +80,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  // Email Label
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -99,8 +92,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-
-                  // Email TextField
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
@@ -123,8 +114,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  // Password Label
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -137,8 +126,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-
-                  // Password TextField
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -172,8 +159,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  // Confirm Password Label
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -186,8 +171,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-
-                  // Confirm Password TextField
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
@@ -221,8 +204,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                   ),
                   const SizedBox(height: 24),
-
-                  // Sign Up Button
                   ElevatedButton(
                     onPressed: _isLoading
                         ? null
@@ -250,8 +231,6 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                   ),
                   const SizedBox(height: 24),
-
-                  // OR Divider
                   Row(
                     children: [
                       Expanded(child: Divider(color: Colors.grey[400])),
@@ -266,8 +245,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-
-                  // Google Sign Up Button
                   OutlinedButton.icon(
                     onPressed: _isLoading ? null : _handleGoogleSignUp,
                     icon: _isLoading
@@ -280,6 +257,8 @@ class _SignupScreenState extends State<SignupScreen> {
                             'assets/images/google_logo.png',
                             height: 24,
                             width: 24,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.g_mobiledata, size: 24),
                           ),
                     label: const Text(
                       AppStrings.signUpWithGoogle,
@@ -298,8 +277,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-
-                  // Sign In Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -339,21 +316,26 @@ class _SignupScreenState extends State<SignupScreen> {
         password: _passwordController.text,
       );
 
-      if (response.user != null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Account created successfully!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
+      if (response.user != null && mounted) {
+        // You can optionally update the user's profile with their name
+        // await _authService.updateUserMetadata({'name': _nameController.text});
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created! Please check your email to verify.'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 4),
+          ),
+        );
+        
+        // Navigate to login or home screen
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Sign up failed: ${e.toString()}'),
+            content: Text(e.toString().replaceAll('Exception: ', '')),
             backgroundColor: Colors.red,
           ),
         );
@@ -372,6 +354,7 @@ class _SignupScreenState extends State<SignupScreen> {
       final success = await _authService.signInWithGoogle();
 
       if (success && mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Google sign up successful!'),
@@ -383,7 +366,7 @@ class _SignupScreenState extends State<SignupScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Google sign up failed: ${e.toString()}'),
+            content: Text(e.toString().replaceAll('Exception: ', '')),
             backgroundColor: Colors.red,
           ),
         );

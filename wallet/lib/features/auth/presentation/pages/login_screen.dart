@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../routes/app_routes.dart';
 import '../../data/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -30,7 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo and Title
                   const Text(
                     '✦ ${AppStrings.appName}',
                     style: TextStyle(
@@ -48,8 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 48),
-
-                  // Email TextField
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
@@ -69,8 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  // Password TextField
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -101,18 +97,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 8),
-
-                  // Forgot Password
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () => _handleForgotPassword(),
                       child: const Text(AppStrings.forgotPassword),
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Sign In Button
                   ElevatedButton(
                     onPressed: _isLoading
                         ? null
@@ -140,8 +132,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                   ),
                   const SizedBox(height: 24),
-
-                  // OR Divider
                   Row(
                     children: [
                       Expanded(child: Divider(color: Colors.grey[400])),
@@ -156,8 +146,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-
-                  // Google Sign In Button
                   OutlinedButton.icon(
                     onPressed: _isLoading ? null : _handleGoogleSignIn,
                     icon: _isLoading
@@ -170,6 +158,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             'assets/images/google_logo.png',
                             height: 24,
                             width: 24,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.g_mobiledata, size: 24),
                           ),
                     label: const Text(
                       AppStrings.signInWithGoogle,
@@ -188,8 +178,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-
-                  // Sign Up Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -199,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, '/signup');
+                          Navigator.pushNamed(context, AppRoutes.signup);
                         },
                         child: const Text(
                           AppStrings.signUp,
@@ -229,23 +217,20 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text,
       );
 
-      if (response.user != null) {
-        if (mounted) {
-          // Navigate to home screen or dashboard
-          // Navigator.pushReplacementNamed(context, AppRoutes.home);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Login successful!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
+      if (response.user != null && mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login successful!'),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login failed: ${e.toString()}'),
+            content: Text(e.toString().replaceAll('Exception: ', '')),
             backgroundColor: Colors.red,
           ),
         );
@@ -264,8 +249,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final success = await _authService.signInWithGoogle();
 
       if (success && mounted) {
-        // Navigate to home screen or dashboard
-        // Navigator.pushReplacementNamed(context, AppRoutes.home);
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Google sign in successful!'),
@@ -277,7 +261,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Google sign in failed: ${e.toString()}'),
+            content: Text(e.toString().replaceAll('Exception: ', '')),
             backgroundColor: Colors.red,
           ),
         );
@@ -289,57 +273,43 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _handleForgotPassword() async {
+    if (_emailController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter your email first'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    try {
+      await _authService.resetPassword(_emailController.text.trim());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Password reset email sent! Check your inbox.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
-}
-
-// Custom Google Icon Widget - ADD THIS AT THE BOTTOM
-class GoogleIcon extends StatelessWidget {
-  const GoogleIcon({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 20,
-      height: 20,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white,
-      ),
-      child: CustomPaint(
-        painter: GoogleLogoPainter(),
-      ),
-    );
-  }
-}
-
-// Google Logo Painter
-class GoogleLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    // Draw a simple "G" representation
-    paint.color = const Color(0xFF4285F4); // Google Blue
-    canvas.drawCircle(
-      Offset(size.width / 2, size.height / 2),
-      size.width / 2,
-      paint,
-    );
-
-    // Draw white center
-    paint.color = Colors.white;
-    canvas.drawCircle(
-      Offset(size.width / 2, size.height / 2),
-      size.width / 3,
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

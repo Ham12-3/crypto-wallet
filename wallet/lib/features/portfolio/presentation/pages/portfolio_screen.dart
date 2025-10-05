@@ -15,17 +15,19 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     CryptoAsset(
       name: 'Bitcoin',
       symbol: 'BTC',
-      amount: '0.29 BTC',
+      amount: '0.25 BTC',
       value: '\$17,125.06',
-      price: '\$68,500.13',
+      price: '\$68,500.23',
+      iconPath: 'assets/images/btc_icon.png',
       color: const Color(0xFFF7931A),
     ),
     CryptoAsset(
       name: 'Ethereum',
       symbol: 'ETH',
-      amount: '3.60 ETH',
+      amount: '3.50 ETH',
       value: '\$13,302.63',
       price: '\$3,800.75',
+      iconPath: 'assets/images/eth_icon.png',
       color: const Color(0xFF627EEA),
     ),
     CryptoAsset(
@@ -34,6 +36,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       amount: '12,000 ADA',
       value: '\$5,400.00',
       price: '\$0.45',
+      iconPath: 'assets/images/ada_icon.png',
       color: const Color(0xFF0033AD),
     ),
     CryptoAsset(
@@ -42,6 +45,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       amount: '20.00 SOL',
       value: '\$3,006.00',
       price: '\$150.30',
+      iconPath: 'assets/images/sol_icon.png',
       color: const Color(0xFF14F195),
     ),
     CryptoAsset(
@@ -50,6 +54,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       amount: '30.00 LTC',
       value: '\$2,400.00',
       price: '\$80.00',
+      iconPath: 'assets/images/ltc_icon.png',
       color: const Color(0xFF345D9D),
     ),
   ];
@@ -86,7 +91,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             child: CircleAvatar(
               radius: 18,
               backgroundColor: Colors.grey[300],
-              child: const Icon(Icons.person, color: Colors.grey),
+              child: const Icon(Icons.person, color: Colors.grey, size: 20),
             ),
           ),
         ],
@@ -181,13 +186,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
-                          child: Text(
-                            asset.symbol[0],
-                            style: TextStyle(
-                              color: asset.color,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          child: Image.asset(
+                            asset.iconPath,
+                            width: 32,
+                            height: 32,
                           ),
                         ),
                       ),
@@ -219,23 +221,19 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Text(
-                                  asset.amount,
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                Text(
-                                  ' @ ${asset.price}',
-                                  style: TextStyle(
-                                    color: Colors.grey[500],
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              asset.amount,
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 13,
+                              ),
+                            ),
+                            Text(
+                              '@ ${asset.price}',
+                              style: TextStyle(
+                                color: Colors.grey[500],
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),
@@ -286,14 +284,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           backgroundColor: Colors.white,
           selectedItemColor: AppColors.primary,
           unselectedItemColor: Colors.grey,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
           elevation: 0,
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
               activeIcon: Icon(Icons.home),
-              label: 'Home',
+              label: 'Portfolio',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.trending_up),
@@ -325,6 +325,7 @@ class CryptoAsset {
   final String amount;
   final String value;
   final String price;
+  final String iconPath;
   final Color color;
 
   CryptoAsset({
@@ -333,6 +334,7 @@ class CryptoAsset {
     required this.amount,
     required this.value,
     required this.price,
+    required this.iconPath,
     required this.color,
   });
 }
