@@ -60,9 +60,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   ];
 
   void _onBottomNavTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 2) {
+      // Navigate to Swap screen
+      Navigator.pushNamed(context, '/swap');
+    } else if (index == 3) {
+      // Navigate to Activities screen
+      Navigator.pushNamed(context, '/activities');
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
@@ -293,19 +301,19 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
               activeIcon: Icon(Icons.home),
-              label: 'Portfolio',
+              label: 'Home',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.trending_up),
-              label: 'Market',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.swap_horiz),
               label: 'Trade',
             ),
             BottomNavigationBarItem(
+              icon: Icon(Icons.swap_horiz),
+              label: 'Swap',
+            ),
+            BottomNavigationBarItem(
               icon: Icon(Icons.history),
-              label: 'History',
+              label: 'Activities',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings_outlined),
