@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 
 class PortfolioScreen extends StatefulWidget {
-  const PortfolioScreen({Key? key}) : super(key: key);
+  const PortfolioScreen({super.key});
 
   @override
   State<PortfolioScreen> createState() => _PortfolioScreenState();
